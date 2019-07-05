@@ -52,8 +52,10 @@
   import 'quill/dist/quill.snow.css'
   import 'quill/dist/quill.bubble.css'
 
-  import { quillEditor } from 'vue-quill-editor'
+  import { quillEditor, Quill } from 'vue-quill-editor'
+  import { ImageExtend, QuillWatch } from 'quill-image-extend-module'
 
+  Quill.register('modules/ImageExtend', ImageExtend)
 
   export default {
     name: "editor",
@@ -64,24 +66,59 @@
       return {
         imageUrl: '',
         content: null,
+        toolbars: [
+          [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{'header': 1}, {'header': 2}],
+            [{'list': 'ordered'}, {'list': 'bullet'}],
+            [{'script': 'sub'}, {'script': 'super'}],
+            [{'indent': '-1'}, {'indent': '+1'}],
+            [{'direction': 'rtl'}],
+            [{'size': ['small', false, 'large', 'huge']}],
+            [{'header': [1, 2, 3, 4, 5, 6, false]}],
+            [{'font': []}],
+            [{'color': []}, {'background': []}],
+            [{'align': []}],
+            ['clean'],
+            ['link', 'image', 'video']
+          ],
+          [
+            ['bold', 'italic', 'underline'],
+            ['blockquote', 'code-block'],
+            [{'list': 'ordered'}, {'list': 'bullet'}],
+            [{'header': [1, 2, 3, 4, 5, 6, false]}],
+            [{'color': []}, {'background': []}],
+            [{'align': []}],
+            ['link', 'image', 'video']
+          ],
+          [
+            ['bold', 'italic', 'underline'],
+            ['blockquote', 'code-block'],
+            [{'list': 'ordered'}, {'list': 'bullet'}],
+            [{'color': []}, {'background': []}],
+            ['insert']
+          ]
+        ],
         editorOption: {
           modules: {
-            toolbar : [
-              ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-              ['blockquote', 'code-block'],//
-              [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-              [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-              [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-              [{ 'direction': 'rtl' }],                         // text direction
-              [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-              [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-              [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-              [{ 'font': [] }],
-              [{ 'align': [] }],
-              ['clean'],// 清除文本格式
-              ["link", "image", "video"] // 链接、图片、视频
-            ]
+            ImageExtend: {
+              loading: true,
+              name: 'image',
+              size: 2,
+              action: `/api/file/upload/image?filePath=${JSON.stringify(this.imagePath)}`,
+              response: (res) => {
+                return res.data
+              }
+            },
+            toolbar: {
+              container: [],
+              handlers: {
+                'image': function () {
+                  QuillWatch.emit(this.quill.id)
+                }
+              }
+            }
           },
           placeholder: 'Insert text here ...', //提示
           readyOnly: false, //是否只读
@@ -96,6 +133,10 @@
           source: ''
         }
       }
+    },
+    created () {
+      // 指定工具栏
+      this.editorOption.modules.toolbar.container = this.toolbars[this.toolbarMode]
     },
     methods: {
       onEditorBlur(quill) {

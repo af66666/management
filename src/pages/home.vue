@@ -88,7 +88,7 @@
           list: [{
             id: "20",
             title: '分享文章',
-            route: '/home/none'
+            route: '/home/articles'
           },{
             id: "21",
             title: '富文本',

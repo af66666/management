@@ -7,6 +7,7 @@ import carousel from '@/pages/carousel'
 import list from '@/pages/list'
 import user from '@/pages/user'
 import editor from '@/pages/editor'
+import articles from '@/pages/articles'
 
 
 Vue.use(Router)
@@ -42,6 +43,10 @@ export default new Router({
         path: 'editor',
         component: editor,
         name: 'editor'
+      }, {
+        path: 'articles',
+        component: articles,
+        name: 'articles'
       }, {
         path: 'none',
         component: NotFound,
